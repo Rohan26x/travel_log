@@ -111,54 +111,6 @@ const styles = {
     color: '#333',
     marginBottom: '30px',
   },
-  metricsContainer: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '24px',
-    marginBottom: '40px',
-  },
-  metricCard: {
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    padding: '24px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.08)',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-  },
-  metricIcon: {
-    fontSize: '32px',
-    marginBottom: '8px',
-  },
-  metricValue: {
-    fontSize: '36px',
-    fontWeight: 'bold',
-    color: '#2196f3',
-  },
-  metricValueGreen: {
-    fontSize: '36px',
-    fontWeight: 'bold',
-    color: '#4caf50',
-  },
-  metricLabel: {
-    fontSize: '14px',
-    color: '#666',
-  },
-  sectionTitle: {
-    fontSize: '20px',
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: '20px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  viewAllLink: {
-    fontSize: '14px',
-    color: '#2196f3',
-    textDecoration: 'none',
-    fontWeight: 'normal',
-  },
   jobCard: {
     backgroundColor: '#fff',
     borderRadius: '8px',
@@ -299,39 +251,25 @@ function Dashboard({ signOut, user }) {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null); 
 
+  // --- MODIFIED: This useEffect no longer redirects ---
+  // It just fetches all the data the dashboard needs.
   useEffect(() => {
-    async function checkProfileAndFetchData() {
+    async function fetchData() {
+      setLoading(true);
       try {
+        // Fetch profile
         const profileData = await client.graphql({
           query: listProfiles,
-          variables: {
-            filter: { owner: { eq: user.username } } 
-          },
-          // --- THIS LINE IS STILL IMPORTANT ---
-          consistencyLevel: 'STRONG' 
+          variables: { filter: { owner: { eq: user.username } } },
+          consistencyLevel: 'STRONG'
         });
-
         const profiles = profileData.data.listProfiles.items;
-
-        if (profiles.length === 0) {
-          router.push('/create-profile');
-        } else {
+        if (profiles.length > 0) {
           setProfile(profiles[0]);
-          await fetchLogs();
         }
-      } catch (err) {
-        console.error('Error checking profile or fetching logs:', err);
-      } finally {
-        setLoading(false); 
-      }
-    }
-
-    async function fetchLogs() {
-      try {
-        const response = await client.graphql({
-          query: listTravelLogs
-        });
         
+        // Fetch logs
+        const response = await client.graphql({ query: listTravelLogs });
         let sortedLogs = response.data.listTravelLogs.items.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
@@ -342,9 +280,7 @@ function Dashboard({ signOut, user }) {
               const fileKey = imageUrl.split('.com/')[1];
               const signedUrlResult = await getUrl({
                 key: fileKey,
-                options: {
-                  validateObjectExistence: true,
-                },
+                options: { validateObjectExistence: true },
               });
               return signedUrlResult.url.href;
             });
@@ -357,15 +293,18 @@ function Dashboard({ signOut, user }) {
 
         const finalLogs = await Promise.all(logsWithSignedImages);
         setLogs(finalLogs);
+
       } catch (err) {
-        console.error('Error fetching travel logs:', err);
+        console.error('Error fetching data:', err);
+      } finally {
+        setLoading(false); 
       }
     }
 
     if (user) {
-      checkProfileAndFetchData();
+      fetchData();
     }
-  }, [user, router]); 
+  }, [user]); 
 
   async function handleDeleteLog(logId) {
     if (!window.confirm("Are you sure you want to delete this log forever?")) {
@@ -383,25 +322,13 @@ function Dashboard({ signOut, user }) {
     }
   }
 
-  if (loading) {
-    return (
-      <div style={styles.wrapper}>
-        <div style={styles.sidebar}>
-           <h2 style={styles.sidebarTitle}>Traveler Portal</h2>
-        </div>
-        <div style={{...styles.mainContent, ...styles.content, alignItems: 'center', paddingTop: '100px'}}>
-          <p>Loading your profile...</p>
-        </div>
-      </div>
-    );
-  }
-
   const totalLogs = logs.length;
   
+  // --- RENDER THE PAGE ---
+  // No more redirect logic. We just render the page.
   return (
-    profile && (
       <div style={styles.wrapper}>
-        {/* Sidebar (unchanged) */}
+        {/* Sidebar */}
         <div style={styles.sidebar}>
           <h2 style={styles.sidebarTitle}>Traveler Portal</h2>
           <Link href="/dashboard" style={{ ...styles.navItem, ...styles.navItemActive }}>
@@ -412,7 +339,7 @@ function Dashboard({ signOut, user }) {
             <span style={styles.navIcon}>➕</span>
             <span>Post New Log</span>
           </Link>
-          <Link href="/dashboard" style={styles.navItem}>
+          <Link href="/profile" style={styles.navItem}>
             <span style={styles.navIcon}>👤</span>
             <span>Profile</span>
           </Link>
@@ -425,8 +352,9 @@ function Dashboard({ signOut, user }) {
           <div style={styles.header}>
             <h1 style={styles.headerTitle}>Travel Portal</h1>
             <div style={styles.headerRight}>
+              {/* This is now "null-safe" */}
               <span style={styles.userEmail}>
-                Welcome, {profile.username}!
+                Welcome, {profile ? profile.username : '...'}!
               </span>
               <button onClick={signOut} style={styles.logoutButton}>
                 Logout
@@ -434,7 +362,7 @@ function Dashboard({ signOut, user }) {
             </div>
           </div>
 
-          {/* Content (This JSX is unchanged) */}
+          {/* Content */}
           <div style={styles.content}>
             <h2 style={styles.dashboardTitle}>
               Traveler Dashboard
@@ -443,7 +371,10 @@ function Dashboard({ signOut, user }) {
               </span>
             </h2>
 
-            {!logs.length && (
+            {/* Show loading spinner just for the logs section */}
+            {loading && <p>Loading your adventures...</p>}
+
+            {!loading && !logs.length && (
               <div style={{ ...styles.jobCard, marginTop: '40px' }}>
                 <p>You haven't created any logs yet. Time for an adventure?</p>
                 <Link href="/create-log" style={styles.viewDetailsButton}>
@@ -452,7 +383,7 @@ function Dashboard({ signOut, user }) {
               </div>
             )}
 
-            {logs.length > 0 && (
+            {!loading && logs.length > 0 && (
               <div style={{ marginTop: '40px' }}>
                 {logs.map((log) => (
                   <div key={log.id} style={styles.jobCard}>
@@ -522,7 +453,6 @@ function Dashboard({ signOut, user }) {
           </div>
         </div>
       </div>
-    )
   );
 }
 

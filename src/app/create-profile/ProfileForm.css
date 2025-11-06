@@ -1,93 +1,109 @@
-/* This is 90% the same as your other Form.css */
+/* --- THIS IS THE NEW LIGHT-THEME VERSION --- */
 .profile-form-container {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 30px;
-    background-color: #282c34;
-    border: 1px solid #444;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-    color: #e0e0e0;
-  }
-  
-  .profile-form-container h1 {
-    text-align: center;
-    color: #61dafb;
-    margin-bottom: 10px;
-  }
-  
-  .profile-form-container p {
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 1.1em;
-    color: #aaa;
-  }
-  
-  .profile-form-container form {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .form-group {
-    margin-bottom: 20px;
-  }
-  
-  .profile-form-container label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #9cdcfe;
-  }
-  
-  .profile-form-container input[type="text"],
-  .profile-form-container input[type="date"],
-  .profile-form-container textarea,
-  .profile-form-container select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #555;
-    border-radius: 6px;
-    background-color: #3a3f4b;
-    color: #e0e0e0;
-    font-size: 16px;
-    box-sizing: border-box; /* Important */
-  }
-  
-  .profile-form-container textarea {
-    min-height: 100px;
-    resize: vertical;
-  }
-  
-  .profile-form-container button[type="submit"] {
-    padding: 14px 25px;
-    background-color: #61dafb;
-    color: #282c34;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 18px;
-    font-weight: bold;
-    width: 100%;
-    margin-top: 10px;
-  }
-  
-  .profile-form-container button[type="submit"]:disabled {
-    background-color: #555;
-    cursor: not-allowed;
-  }
-  
-  /* Error Message */
-  .status-message.error {
-    padding: 12px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    font-weight: bold;
-    text-align: center;
-    background-color: #e74c3c;
-    color: white;
-  }
+  max-width: 700px;
+  /* Remove the dark background and shadow */
+  margin: 0 auto; /* Center it in the white content area */
+  padding: 10px; /* Add a little space */
+  background-color: #fff; /* Match the content pane */
+  color: #333; /* Set text to dark */
+}
 
-  /* --- NEW STYLES FOR SUCCESS MESSAGE --- */
+.profile-form-container h1 {
+  text-align: left; /* Align with form */
+  color: #333; /* Dark text */
+  margin-bottom: 10px;
+}
+
+.profile-form-container p {
+  text-align: left;
+  margin-bottom: 30px;
+  font-size: 1.1em;
+  color: #666; /* Lighter dark text */
+}
+
+.profile-form-container form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.profile-form-container label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #444; /* Dark label */
+}
+
+/* Light-theme for form fields */
+.profile-form-container input[type="text"],
+.profile-form-container input[type="date"],
+.profile-form-container textarea,
+.profile-form-container select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc; /* Lighter border */
+  border-radius: 6px;
+  background-color: #f9f9f9; /* Light field background */
+  color: #333; /* Dark text */
+  font-size: 16px;
+  box-sizing: border-box; 
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Focus style for light theme */
+.profile-form-container input[type="text"]:focus,
+.profile-form-container input[type="date"]:focus,
+.profile-form-container textarea:focus,
+.profile-form-container select:focus {
+  border-color: #2196f3; /* Blue focus */
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+  outline: none;
+}
+
+.profile-form-container textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Button to match your dashboard theme */
+.profile-form-container button[type="submit"] {
+  padding: 14px 25px;
+  background-color: #2196f3; /* Dashboard blue */
+  color: #fff; /* White text */
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  width: 100%;
+  margin-top: 10px;
+  transition: background-color 0.2s;
+}
+
+.profile-form-container button[type="submit"]:hover:not(:disabled) {
+  background-color: #1a78c2; /* Darker blue */
+}
+
+.profile-form-container button[type="submit"]:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+/* Error Message */
+.status-message.error {
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+  background-color: #e74c3c;
+  color: white;
+}
+
+/* Success Message from create-profile */
 .success-message {
   text-align: center;
 }
@@ -99,8 +115,8 @@
 .success-button {
   display: inline-block;
   padding: 14px 25px;
-  background-color: #61dafb;
-  color: #282c34;
+  background-color: #2196f3; /* Dashboard blue */
+  color: #fff; /* White text */
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -112,33 +128,5 @@
 }
 
 .success-button:hover {
-  background-color: #21a1f1;
-}
-
-/* --- NEW STYLES FOR SUCCESS MESSAGE --- */
-.success-message {
-  text-align: center;
-}
-
-.success-message h1 {
-  color: #2ecc71; /* Green */
-}
-
-.success-button {
-  display: inline-block;
-  padding: 14px 25px;
-  background-color: #61dafb;
-  color: #282c34;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: bold;
-  text-decoration: none;
-  margin-top: 20px;
-  transition: background-color 0.2s;
-}
-
-.success-button:hover {
-  background-color: #21a1f1;
+  background-color: #1a78c2;
 }
