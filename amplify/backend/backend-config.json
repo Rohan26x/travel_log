@@ -74,6 +74,40 @@
       "service": "Lambda"
     }
   },
+  "parameters": {
+    "AMPLIFY_function_googleImageSearch_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "googleImageSearch"
+        }
+      ]
+    },
+    "AMPLIFY_function_googleImageSearch_googleApiKey": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "googleImageSearch"
+        }
+      ]
+    },
+    "AMPLIFY_function_googleImageSearch_googleSearchEngineId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "googleImageSearch"
+        }
+      ]
+    },
+    "AMPLIFY_function_googleImageSearch_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "googleImageSearch"
+        }
+      ]
+    }
+  },
   "storage": {
     "travellogdb": {
       "dependsOn": [],

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import './Form.css'; // Your big CSS file
 import { get } from 'aws-amplify/api'; // To call your REST API
+import { getUrl } from 'aws-amplify/storage'; // To get signed URLs for images
 
 // This is a reusable component now. It's not a "page".
 export default function TravelLogForm({ initialData, handleSubmit, isSubmitting }) {
@@ -18,16 +19,16 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
     weather: [],
   });
   
-  // State for file management
+  // --- MODIFIED: State for file management ---
   const [newImageFiles, setNewImageFiles] = useState([]);
-  const [existingImageUrls, setExistingImageUrls] = useState([]);
+  // This will now hold objects: { permanentUrl: '...', signedUrl: '...' }
+  const [existingImages, setExistingImages] = useState([]); 
   
-  // State for location detection
+  // State for UI helpers
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
-
-  // --- NEW: State for image suggestions ---
   const [suggestedImages, setSuggestedImages] = useState([]);
   const [isSuggesting, setIsSuggesting] = useState(false);
+  const [isDragging, setIsDragging] = useState(false); // For drag-and-drop
 
   // Constants for UI elements
   const funEmojis = ['😭', '😔', '😐', '🙂', '🤩'];
@@ -36,9 +37,10 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
     '⚡ Thunder', '💨 Windy', '🌫️ Foggy'
   ];
 
-  // This 'useEffect' pre-fills the form for editing
+  // --- MODIFIED: This 'useEffect' now signs the URLs ---
   useEffect(() => {
     if (initialData) {
+      // Pre-fill the text fields
       setFormData({
         location: initialData.location || '',
         whatYouDidThere: initialData.whatYouDidThere || '',
@@ -48,7 +50,39 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
         funLevel: initialData.funLevel || 3,
         weather: initialData.weather ? initialData.weather.split(', ') : [],
       });
-      setExistingImageUrls(initialData.imageUrls || []);
+
+      // --- THIS IS THE BUG FIX ---
+      // Take the permanent S3 URLs from the database and get temporary,
+      // viewable (signed) URLs for them so they can be displayed in <img> tags.
+      const fetchSignedUrls = async (permanentUrls) => {
+        const signedImageObjects = await Promise.all(
+          permanentUrls.map(async (permanentUrl) => {
+            // Get the S3 key from the full URL
+            const fileKey = permanentUrl.split('.com/')[1]; 
+            try {
+              // Fetch the secure, temporary URL
+              const signedUrlResult = await getUrl({
+                key: fileKey,
+                options: { validateObjectExistence: true },
+              });
+              return {
+                permanentUrl: permanentUrl,
+                signedUrl: signedUrlResult.url.href, // This is the one we can use in <img src>
+              };
+            } catch (err) {
+              console.error('Error signing URL:', err);
+              // Return a broken link object so the user knows something is wrong
+              return { permanentUrl: permanentUrl, signedUrl: null }; 
+            }
+          })
+        );
+        setExistingImages(signedImageObjects);
+      };
+
+      if (initialData.imageUrls && initialData.imageUrls.length > 0) {
+        fetchSignedUrls(initialData.imageUrls);
+      }
+      // --- END BUG FIX ---
     }
   }, [initialData]);
 
@@ -61,9 +95,10 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
     }));
   };
 
-  // Handles NEW file selection
-  const handleFileChange = (e) => {
-    setNewImageFiles(Array.from(e.target.files));
+  // --- MODIFIED: Now handles file list from drag-drop OR click ---
+  const handleFileChange = (files) => {
+    // Add new files to any existing files in the staging area
+    setNewImageFiles((prevFiles) => [...prevFiles, ...Array.from(files)]);
   };
 
   // Handles clicking on weather tags
@@ -76,23 +111,28 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
     });
   };
 
-  // A function to remove an *existing* image
-  const handleRemoveExistingImage = (imageUrlToRemove) => {
-    setExistingImageUrls(
-      existingImageUrls.filter(url => url !== imageUrlToRemove)
+  // --- MODIFIED: Now filters based on permanentUrl ---
+  const handleRemoveExistingImage = (permanentUrlToRemove) => {
+    setExistingImages(
+      existingImages.filter(img => img.permanentUrl !== permanentUrlToRemove)
     );
   };
 
-  // Function to auto-detect location
+  // --- NEW: Function to remove a *newly staged* image ---
+  const handleRemoveNewImage = (fileNameToRemove) => {
+    setNewImageFiles(
+      newImageFiles.filter(file => file.name !== fileNameToRemove)
+    );
+  };
+
+  // Function to auto-detect location (unchanged)
   const handleDetectLocation = async () => {
     setIsDetectingLocation(true);
-
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser.");
       setIsDetectingLocation(false);
       return;
     }
-
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
@@ -125,18 +165,15 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
     );
   };
 
-  // --- NEW: Function to get Google Image suggestions ---
+  // Function to get Google Image suggestions (unchanged)
   const handleSuggestImages = async () => {
     if (!formData.location) {
       alert("Please enter a location first.");
       return;
     }
-    
     setIsSuggesting(true);
-    setSuggestedImages([]); // Clear old results
-    
+    setSuggestedImages([]); 
     try {
-      // This calls your 'googleImageSearch' REST API
       const restOperation = get({
         apiName: 'googleImageSearch',
         path: '/images',
@@ -146,14 +183,11 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
           }
         }
       });
-      
       const { body } = await restOperation.response;
       const data = await body.json();
-      
       if (data.images) {
         setSuggestedImages(data.images);
       }
-      
     } catch (err) {
       console.error("Error fetching image suggestions:", err);
       alert("Could not fetch image suggestions.");
@@ -162,18 +196,41 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
     }
   };
   
-  // This is the local submit handler
+  // --- NEW: Drag-and-Drop Handlers ---
+  const handleDragOver = (e) => {
+    e.preventDefault(); // This is necessary to allow a drop
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      handleFileChange(files); // Use our existing file handler
+      e.dataTransfer.clearData();
+    }
+  };
+
+  // --- MODIFIED: Passes the correct list of permanent URLs ---
   const onFormSubmit = (e) => {
     e.preventDefault();
-    // Pass all the data up to the parent
-    handleSubmit(formData, newImageFiles, existingImageUrls);
+    // We only send the *permanent* URLs back, not the temporary signed ones
+    const finalExistingUrls = existingImages.map(img => img.permanentUrl);
+    handleSubmit(formData, newImageFiles, finalExistingUrls);
   };
 
   // --- RENDER THE FORM ---
   return (
     <main className="form-container">      
       <form onSubmit={onFormSubmit}>
-        {/* Location group with new button */}
+        
+        {/* Location group */}
         <div className="form-group">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
             <label htmlFor="location">Location:</label>
@@ -197,6 +254,7 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
           />
         </div>
 
+        {/* What You Did */}
         <div className="form-group">
           <label htmlFor="whatYouDidThere">What you did there:</label>
           <textarea
@@ -208,6 +266,7 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
           />
         </div>
 
+        {/* Overall Experience */}
         <div className="form-group">
           <label htmlFor="overallExperience">Overall Experience:</label>
           <textarea
@@ -219,15 +278,16 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
           />
         </div>
 
-        {/* Logic to display existing images */}
-        {existingImageUrls.length > 0 && (
+        {/* --- MODIFIED: Logic to display existing images --- */}
+        {existingImages.length > 0 && (
           <div className="form-group">
             <label>Existing Images:</label>
             <div className="existing-images-container">
-              {existingImageUrls.map((url) => (
-                <div key={url} className="existing-image-item">
-                  <img src={url} alt="Uploaded log" />
-                  <button type="button" onClick={() => handleRemoveExistingImage(url)}>
+              {existingImages.map((image) => (
+                <div key={image.permanentUrl} className="existing-image-item">
+                  {/* Use the signedUrl for the src, which is now safe */}
+                  <img src={image.signedUrl || ''} alt="Uploaded log" />
+                  <button type="button" onClick={() => handleRemoveExistingImage(image.permanentUrl)}>
                     &times;
                   </button>
                 </div>
@@ -236,19 +296,45 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
           </div>
         )}
 
+        {/* --- NEW: Drag-and-Drop Upload Zone --- */}
         <div className="form-group">
           <label htmlFor="images">Upload New Images:</label>
-          <input
-            type="file"
-            id="images"
-            name="images"
-            onChange={handleFileChange}
-            multiple
-            accept="image/*"
-          />
+          <div 
+            className={`drop-zone ${isDragging ? 'dragging' : ''}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <p>Drag & drop files here, or click to select</p>
+            <input
+              type="file"
+              id="images"
+              name="images"
+              // Use our handler for the click event
+              onChange={(e) => handleFileChange(e.target.files)} 
+              multiple
+              accept="image/*"
+              className="drop-zone-input" // This is hidden by CSS
+            />
+          </div>
+          
+          {/* --- NEW: Staging area for new images --- */}
+          {newImageFiles.length > 0 && (
+            <div className="new-images-container">
+              <p>Files to upload:</p>
+              {newImageFiles.map((file, index) => (
+                <div key={index} className="new-image-item">
+                  <span>{file.name}</span>
+                  <button type="button" onClick={() => handleRemoveNewImage(file.name)}>
+                    &times;
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* --- NEW: Image Suggestion Section --- */}
+        {/* Image Suggestion Section */}
         <div className="form-group">
           <label>Or, get inspiration:</label>
           <button 
@@ -275,6 +361,7 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
           )}
         </div>
 
+        {/* Place */}
          <div className="form-group">
             <label htmlFor="place">Place (e.g., Cafe, Mall, Hill Station):</label>
             <input
@@ -286,6 +373,7 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
             />
           </div>
 
+        {/* Region Speciality */}
           <div className="form-group">
             <label htmlFor="regionSpeciality">Region Speciality (Food, Dress, etc.):</label>
             <input
@@ -297,7 +385,7 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
             />
           </div>
 
-        {/* Custom Fun Level Slider */}
+        {/* Fun Level Slider */}
         <div className="form-group">
           <label htmlFor="funLevel" className="fun-label">
             Level of Fun: <span className="fun-emoji">{funEmojis[formData.funLevel - 1]}</span>
@@ -333,6 +421,7 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
           </div>
         </div>
 
+        {/* Submit Button */}
         <button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Saving...' : 'Save Log'}
         </button>
