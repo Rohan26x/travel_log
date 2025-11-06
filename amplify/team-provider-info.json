@@ -18,7 +18,8 @@
       },
       "api": {
         "travellog": {},
-        "googleImageSearch": {}
+        "googleImageSearch": {},
+        "imageProxy": {}
       },
       "storage": {
         "travellogdb": {}
@@ -29,6 +30,10 @@
           "s3Key": "amplify-builds/googleImageSearch-75747762364c6972475a-build.zip",
           "googleApiKey": "AIzaSyA0LiIpe1ehzSaoLlfYcCZv-gcou788e4s",
           "googleSearchEngineId": "60a5afbe548b14961"
+        },
+        "imageProxyFunction": {
+          "deploymentBucketName": "amplify-travellog-dev-edba3-deployment",
+          "s3Key": "amplify-builds/imageProxyFunction-4a61432f354e69506c47-build.zip"
         }
       }
     }

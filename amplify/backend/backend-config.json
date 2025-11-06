@@ -14,6 +14,20 @@
       "providerPlugin": "awscloudformation",
       "service": "API Gateway"
     },
+    "imageProxy": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "imageProxyFunction"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    },
     "travellog": {
       "dependsOn": [
         {
@@ -72,6 +86,20 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "imageProxyFunction": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "BucketName"
+          ],
+          "category": "storage",
+          "resourceName": "travellogdb"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
   "parameters": {
@@ -104,6 +132,22 @@
         {
           "category": "function",
           "resourceName": "googleImageSearch"
+        }
+      ]
+    },
+    "AMPLIFY_function_imageProxyFunction_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "imageProxyFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_imageProxyFunction_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "imageProxyFunction"
         }
       ]
     }

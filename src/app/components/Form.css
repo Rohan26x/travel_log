@@ -3,16 +3,16 @@
   max-width: 700px;
   margin: 40px auto;
   padding: 30px;
-  background-color: #282c34; /* Darker background */
+  background-color: #282c34;
   border: 1px solid #444;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-  color: #e0e0e0; /* Light text for dark background */
+  color: #e0e0e0;
 }
 
 .form-container h1 {
   text-align: center;
-  color: #61dafb; /* React blue for headings */
+  color: #61dafb;
   margin-bottom: 30px;
   font-size: 2em;
 }
@@ -26,7 +26,7 @@
   display: block;
   margin-bottom: 8px;
   font-weight: bold;
-  color: #9cdcfe; /* Lighter blue for labels */
+  color: #9cdcfe;
 }
 
 /* Input Styles */
@@ -37,7 +37,7 @@
   padding: 12px;
   border: 1px solid #555;
   border-radius: 6px;
-  background-color: #3a3f4b; /* Darker input background */
+  background-color: #3a3f4b;
   color: #e0e0e0;
   font-size: 16px;
   box-sizing: border-box;
@@ -54,14 +54,14 @@
 
 .form-container textarea {
   min-height: 120px;
-  resize: vertical; /* Allow vertical resizing */
+  resize: vertical;
 }
 
 /* Submit Button */
 .form-container button[type="submit"] {
   padding: 14px 25px;
   background-color: #61dafb;
-  color: #282c34; /* Dark text on light button */
+  color: #282c34;
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -91,8 +91,8 @@
 }
 
 .fun-emoji {
-  font-size: 2.5em; /* Make emoji larger */
-  line-height: 1; /* Adjust vertical alignment */
+  font-size: 2.5em;
+  line-height: 1;
   transition: transform 0.2s ease;
 }
 
@@ -102,10 +102,10 @@
 }
 
 .fun-slider {
-  -webkit-appearance: none; /* Override default CSS for slider */
+  -webkit-appearance: none;
   width: 100%;
-  height: 10px; /* Thickness of the slider */
-  background: linear-gradient(to right, #e74c3c, #f39c12, #f1c40f, #2ecc71, #27ae60); /* Rainbow gradient */
+  height: 10px;
+  background: linear-gradient(to right, #e74c3c, #f39c12, #f1c40f, #2ecc71, #27ae60);
   border-radius: 5px;
   outline: none;
   opacity: 0.9;
@@ -115,12 +115,12 @@
 .fun-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 25px; /* Size of the slider thumb */
+  width: 25px;
   height: 25px;
-  border-radius: 50%; /* Round thumb */
-  background: #61dafb; /* Bright blue thumb */
+  border-radius: 50%;
+  background: #61dafb;
   cursor: pointer;
-  border: 2px solid #282c34; /* Dark border for contrast */
+  border: 2px solid #282c34;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
 }
 
@@ -145,7 +145,7 @@
 .weather-tag {
   padding: 10px 15px;
   border: 1px solid #555;
-  border-radius: 20px; /* More rounded pill shape */
+  border-radius: 20px;
   background-color: #3a3f4b;
   color: #e0e0e0;
   cursor: pointer;
@@ -159,7 +159,7 @@
 }
 
 .weather-tag.selected {
-  background-color: #61dafb; /* Selected state color */
+  background-color: #61dafb;
   color: #282c34;
   border-color: #61dafb;
   font-weight: bold;
@@ -173,23 +173,11 @@
   font-weight: bold;
   text-align: center;
 }
+.status-message.loading { background-color: #3498db; color: white; }
+.status-message.error { background-color: #e74c3c; color: white; }
+.status-message.success { background-color: #2ecc71; color: white; }
 
-.status-message.loading {
-  background-color: #3498db;
-  color: white;
-}
-
-.status-message.error {
-  background-color: #e74c3c;
-  color: white;
-}
-
-.status-message.success {
-  background-color: #2ecc71;
-  color: white;
-}
-
-/* STYLES FOR EDIT PAGE (EXISTING IMAGES) */
+/* Existing Images (Edit mode) */
 .existing-images-container {
   display: flex;
   flex-wrap: wrap;
@@ -230,7 +218,7 @@
   justify-content: center;
 }
 
-/* STYLES FOR LOCATION BUTTON */
+/* Location Button */
 .detect-location-btn {
   padding: 6px 10px;
   font-size: 0.9em;
@@ -241,41 +229,25 @@
   cursor: pointer;
   transition: background-color 0.2s;
 }
+.detect-location-btn:hover:not(:disabled) { background-color: #777; }
+.detect-location-btn:disabled { background-color: #444; opacity: 0.7; cursor: not-allowed; }
 
-.detect-location-btn:hover:not(:disabled) {
-  background-color: #777;
-}
-
-.detect-location-btn:disabled {
-  background-color: #444;
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* STYLES FOR SUGGESTION BUTTON */
+/* Suggestion Button */
 .suggest-btn {
   width: 100%;
   padding: 10px 15px;
   font-size: 1em;
-  background-color: #2ecc71; /* Green */
+  background-color: #2ecc71;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s;
 }
+.suggest-btn:hover:not(:disabled) { background-color: #27ae60; }
+.suggest-btn:disabled { background-color: #555; opacity: 0.7; cursor: not-allowed; }
 
-.suggest-btn:hover:not(:disabled) {
-  background-color: #27ae60;
-}
-
-.suggest-btn:disabled {
-  background-color: #555;
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* STYLES FOR SUGGESTION GALLERY */
+/* Suggestion Gallery */
 .suggested-images-gallery {
   display: flex;
   flex-wrap: wrap;
@@ -286,26 +258,69 @@
   border-radius: 4px;
 }
 
-.suggested-images-gallery a {
+/* --- NEW: Individual suggested image item --- */
+.suggested-image-item {
   width: 100px;
   height: 75px;
-  border: 2px solid transparent;
   border-radius: 4px;
   overflow: hidden;
-  transition: border-color 0.2s;
+  position: relative; /* This is key for the overlay */
+  border: 1px solid #555;
 }
 
-.suggested-images-gallery a:hover {
-  border-color: #61dafb;
-}
-
-.suggested-images-gallery img {
+.suggested-image-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* --- NEW: STYLES FOR DRAG & DROP --- */
+/* --- NEW: The overlay that appears on hover --- */
+.suggested-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  opacity: 0; /* Hide by default */
+  transition: opacity 0.2s ease-in-out;
+}
+
+.suggested-image-item:hover .suggested-image-overlay {
+  opacity: 1; /* Show on hover */
+}
+
+.suggested-image-overlay a,
+.suggested-image-overlay button {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  text-decoration: none;
+  color: #282c34;
+  cursor: pointer;
+}
+
+.suggested-image-overlay button:disabled {
+  cursor: not-allowed;
+  animation: spin 1s linear infinite;
+}
+
+.suggested-image-overlay a:hover,
+.suggested-image-overlay button:hover:not(:disabled) {
+  background-color: white;
+}
+
+/* --- NEW: Drag & Drop Zone --- */
 .drop-zone {
   padding: 30px;
   border: 3px dashed #555;
@@ -315,7 +330,7 @@
   color: #9cdcfe;
   cursor: pointer;
   transition: background-color 0.2s, border-color 0.2s;
-  position: relative; /* For the input */
+  position: relative; 
 }
 
 .drop-zone.dragging {
@@ -329,7 +344,6 @@
 }
 
 .drop-zone-input {
-  /* Hide the default input but make it clickable */
   position: absolute;
   top: 0;
   left: 0;
@@ -339,7 +353,7 @@
   cursor: pointer;
 }
 
-/* --- NEW: STYLES FOR STAGING AREA --- */
+/* --- NEW: Staging Area for new files --- */
 .new-images-container {
   margin-top: 15px;
   padding: 10px;
@@ -376,4 +390,10 @@
   cursor: pointer;
   font-weight: bold;
   padding: 0;
+}
+
+/* Simple spin animation for the loading state */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
