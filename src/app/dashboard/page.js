@@ -28,6 +28,7 @@ const styles = {
     height: '100vh',
     left: 0,
     top: 0,
+    zIndex: 100, // Keep sidebar on top
   },
   sidebarTitle: {
     fontSize: '18px',
@@ -242,6 +243,31 @@ const styles = {
     objectFit: 'cover',
     borderRadius: '8px',
   },
+  
+  // --- THIS IS THE NEW STYLE FOR THE FLOATING BUTTON ---
+  floatingActionButton: {
+    position: 'fixed',
+    width: '60px',
+    height: '60px',
+    bottom: '40px',
+    right: '40px',
+    backgroundColor: '#2196f3',
+    color: 'white',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '30px',
+    fontWeight: 'bold',
+    textDecoration: 'none',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+    zIndex: 1001, // Higher than the sidebar
+    transition: 'transform 0.2s ease-in-out, background-color 0.2s',
+  },
+  floatingActionButtonHover: { // We'll add this with JS, but define it here
+     transform: 'scale(1.1)',
+     backgroundColor: '#1a78c2',
+  }
 };
 // --- END OF FULL STYLES OBJECT ---
 
@@ -250,9 +276,8 @@ function Dashboard({ signOut, user }) {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null); 
+  const [isFabHovered, setIsFabHovered] = useState(false); // For hover effect
 
-  // --- MODIFIED: This useEffect no longer redirects ---
-  // It just fetches all the data the dashboard needs.
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
@@ -322,11 +347,25 @@ function Dashboard({ signOut, user }) {
     }
   }
 
+  // Show a loading screen while we check for the profile
+  if (loading) {
+    return (
+      <div style={styles.wrapper}>
+        <div style={styles.sidebar}>
+           <h2 style={styles.sidebarTitle}>Traveler Portal</h2>
+        </div>
+        <div style={{...styles.mainContent, ...styles.content, alignItems: 'center', paddingTop: '100px'}}>
+          <p>Loading your profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If not loading, and profile *exists*, render the dashboard.
   const totalLogs = logs.length;
   
-  // --- RENDER THE PAGE ---
-  // No more redirect logic. We just render the page.
   return (
+    profile && (
       <div style={styles.wrapper}>
         {/* Sidebar */}
         <div style={styles.sidebar}>
@@ -352,9 +391,8 @@ function Dashboard({ signOut, user }) {
           <div style={styles.header}>
             <h1 style={styles.headerTitle}>Travel Portal</h1>
             <div style={styles.headerRight}>
-              {/* This is now "null-safe" */}
               <span style={styles.userEmail}>
-                Welcome, {profile ? profile.username : '...'}!
+                Welcome, {profile.username}!
               </span>
               <button onClick={signOut} style={styles.logoutButton}>
                 Logout
@@ -371,10 +409,10 @@ function Dashboard({ signOut, user }) {
               </span>
             </h2>
 
-            {/* Show loading spinner just for the logs section */}
-            {loading && <p>Loading your adventures...</p>}
+            {/* --- OLD BUTTON IS REMOVED FROM HERE --- */}
 
-            {!loading && !logs.length && (
+            {/* Log Cards */}
+            {!logs.length && (
               <div style={{ ...styles.jobCard, marginTop: '40px' }}>
                 <p>You haven't created any logs yet. Time for an adventure?</p>
                 <Link href="/create-log" style={styles.viewDetailsButton}>
@@ -383,7 +421,7 @@ function Dashboard({ signOut, user }) {
               </div>
             )}
 
-            {!loading && logs.length > 0 && (
+            {logs.length > 0 && (
               <div style={{ marginTop: '40px' }}>
                 {logs.map((log) => (
                   <div key={log.id} style={styles.jobCard}>
@@ -452,7 +490,22 @@ function Dashboard({ signOut, user }) {
             )}
           </div>
         </div>
+
+        {/* --- THIS IS THE NEW FLOATING BUTTON --- */}
+        <Link 
+          href="/create-log"
+          style={{
+            ...styles.floatingActionButton,
+            ...(isFabHovered ? styles.floatingActionButtonHover : null)
+          }}
+          onMouseEnter={() => setIsFabHovered(true)}
+          onMouseLeave={() => setIsFabHovered(false)}
+          title="Create a new log"
+        >
+          +
+        </Link>
       </div>
+    )
   );
 }
 
