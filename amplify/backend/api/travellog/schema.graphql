@@ -1,0 +1,11 @@
+type TravelLog @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  location: String!
+  whatYouDidThere: String!
+  overallExperience: String!
+  imageUrls: [String]
+  place: String
+  regionSpeciality: String
+  funLevel: Int
+  weather: String
+}

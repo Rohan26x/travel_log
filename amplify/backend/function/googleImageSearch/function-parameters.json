@@ -1,0 +1,13 @@
+{
+  "lambdaLayers": [],
+  "environmentVariableList": [
+    {
+      "cloudFormationParameterName": "googleApiKey",
+      "environmentVariableName": "GOOGLE_API_KEY"
+    },
+    {
+      "cloudFormationParameterName": "googleSearchEngineId",
+      "environmentVariableName": "GOOGLE_SEARCH_ENGINE_ID"
+    }
+  ]
+}

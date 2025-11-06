@@ -1,0 +1,14 @@
+{
+  "resourceName": "travellogdb",
+  "policyUUID": "4f2e6be9",
+  "bucketName": "travellog26x",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "NONE",
+  "groupAccess": {}
+}

@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "paths": {
+    "/images": {
+      "name": "/images",
+      "lambdaFunction": "googleImageSearch",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "read"
+        ]
+      }
+    }
+  }
+}

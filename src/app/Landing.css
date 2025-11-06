@@ -1,0 +1,62 @@
+.landing-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .landing-content {
+    max-width: 600px;
+  }
+  
+  .landing-title {
+    font-size: 3.5rem;
+    color: #61dafb;
+    margin-bottom: 20px;
+  }
+  
+  .landing-description {
+    font-size: 1.25rem;
+    color: #e0e0e0;
+    margin-bottom: 40px;
+    line-height: 1.6;
+  }
+  
+  .landing-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .landing-btn {
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .landing-btn.primary {
+    background-color: #61dafb;
+    color: #282c34;
+  }
+  
+  .landing-btn.primary:hover {
+    background-color: #21a1f1;
+    transform: translateY(-2px);
+  }
+  
+  .landing-btn.secondary {
+    background-color: transparent;
+    color: #61dafb;
+    border: 2px solid #61dafb;
+  }
+  
+  .landing-btn.secondary:hover {
+    background-color: #61dafb;
+    color: #282c34;
+    transform: translateY(-2px);
+  }

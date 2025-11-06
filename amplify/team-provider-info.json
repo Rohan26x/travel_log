@@ -1,0 +1,36 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-travellog-dev-edba3-authRole",
+      "UnauthRoleArn": "arn:aws:iam::248076009919:role/amplify-travellog-dev-edba3-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::248076009919:role/amplify-travellog-dev-edba3-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-travellog-dev-edba3-deployment",
+      "UnauthRoleName": "amplify-travellog-dev-edba3-unauthRole",
+      "StackName": "amplify-travellog-dev-edba3",
+      "StackId": "arn:aws:cloudformation:us-east-1:248076009919:stack/amplify-travellog-dev-edba3/00e6ac60-ba9b-11f0-811e-0affd119c45b",
+      "AmplifyAppId": "djhhafx1mv2y1",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-travellog-dev-edba3-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
+    },
+    "categories": {
+      "auth": {
+        "travellog44cb0c14": {}
+      },
+      "api": {
+        "travellog": {},
+        "googleImageSearch": {}
+      },
+      "storage": {
+        "travellogdb": {}
+      },
+      "function": {
+        "googleImageSearch": {
+          "deploymentBucketName": "amplify-travellog-dev-edba3-deployment",
+          "s3Key": "amplify-builds/googleImageSearch-75747762364c6972475a-build.zip",
+          "googleApiKey": "AIzaSyA0LiIpe1ehzSaoLlfYcCZv-gcou788e4s",
+          "googleSearchEngineId": "60a5afbe548b14961"
+        }
+      }
+    }
+  }
+}
