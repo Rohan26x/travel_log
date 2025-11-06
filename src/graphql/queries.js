@@ -47,3 +47,45 @@ export const listTravelLogs = /* GraphQL */ `
     }
   }
 `;
+export const getProfile = /* GraphQL */ `
+  query GetProfile($id: ID!) {
+    getProfile(id: $id) {
+      id
+      owner
+      username
+      firstName
+      lastName
+      birthdate
+      gender
+      bio
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listProfiles = /* GraphQL */ `
+  query ListProfiles(
+    $filter: ModelProfileFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listProfiles(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        owner
+        username
+        firstName
+        lastName
+        birthdate
+        gender
+        bio
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;

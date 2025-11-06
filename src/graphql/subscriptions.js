@@ -67,3 +67,63 @@ export const onDeleteTravelLog = /* GraphQL */ `
     }
   }
 `;
+export const onCreateProfile = /* GraphQL */ `
+  subscription OnCreateProfile(
+    $filter: ModelSubscriptionProfileFilterInput
+    $owner: String
+  ) {
+    onCreateProfile(filter: $filter, owner: $owner) {
+      id
+      owner
+      username
+      firstName
+      lastName
+      birthdate
+      gender
+      bio
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateProfile = /* GraphQL */ `
+  subscription OnUpdateProfile(
+    $filter: ModelSubscriptionProfileFilterInput
+    $owner: String
+  ) {
+    onUpdateProfile(filter: $filter, owner: $owner) {
+      id
+      owner
+      username
+      firstName
+      lastName
+      birthdate
+      gender
+      bio
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteProfile = /* GraphQL */ `
+  subscription OnDeleteProfile(
+    $filter: ModelSubscriptionProfileFilterInput
+    $owner: String
+  ) {
+    onDeleteProfile(filter: $filter, owner: $owner) {
+      id
+      owner
+      username
+      firstName
+      lastName
+      birthdate
+      gender
+      bio
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;

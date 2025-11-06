@@ -9,3 +9,14 @@ type TravelLog @model @auth(rules: [{ allow: owner }]) {
   funLevel: Int
   weather: String
 }
+
+type Profile @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  owner: String        # This links to the Cognito user ID
+  username: String!    # This is the new, required display name
+  firstName: String
+  lastName: String
+  birthdate: AWSDate
+  gender: String
+  bio: String
+}

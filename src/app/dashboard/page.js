@@ -3,14 +3,15 @@
 import { useState, useEffect } from 'react';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation'; 
 import { generateClient } from 'aws-amplify/api';
 import { getUrl } from 'aws-amplify/storage';
-
-import { listTravelLogs } from '@/graphql/queries';
+import { listTravelLogs, listProfiles } from '@/graphql/queries'; 
 import { deleteTravelLog } from '@/graphql/mutations';
 
 const client = generateClient();
 
+// --- FULL STYLES OBJECT ---
 const styles = {
   wrapper: {
     display: 'flex',
@@ -273,7 +274,7 @@ const styles = {
   imageItem: {
     position: 'relative',
     width: '100%',
-    paddingTop: '75%', // 4:3 aspect ratio
+    paddingTop: '75%', 
     borderRadius: '8px',
     overflow: 'hidden',
     backgroundColor: '#f5f5f5',
@@ -290,53 +291,81 @@ const styles = {
     borderRadius: '8px',
   },
 };
+// --- END OF FULL STYLES OBJECT ---
 
 function Dashboard({ signOut, user }) {
+  const router = useRouter();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState(null); 
 
   useEffect(() => {
-    fetchLogs();
-  }, []);
+    async function checkProfileAndFetchData() {
+      try {
+        const profileData = await client.graphql({
+          query: listProfiles,
+          variables: {
+            filter: { owner: { eq: user.username } } 
+          },
+          // --- THIS LINE IS STILL IMPORTANT ---
+          consistencyLevel: 'STRONG' 
+        });
 
-  async function fetchLogs() {
-    try {
-      const response = await client.graphql({
-        query: listTravelLogs
-      });
-      
-      let sortedLogs = response.data.listTravelLogs.items.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
+        const profiles = profileData.data.listProfiles.items;
 
-      const logsWithSignedImages = sortedLogs.map(async (log) => {
-        if (log.imageUrls && log.imageUrls.length > 0) {
-          const signedUrlsPromises = log.imageUrls.map(async (imageUrl) => {
-            const fileKey = imageUrl.split('.com/')[1];
-            const signedUrlResult = await getUrl({
-              key: fileKey,
-              options: {
-                validateObjectExistence: true,
-              },
-            });
-            return signedUrlResult.url.href;
-          });
-          const signedUrls = await Promise.all(signedUrlsPromises);
-          return { ...log, signedImageUrls: signedUrls };
+        if (profiles.length === 0) {
+          router.push('/create-profile');
         } else {
-          return log;
+          setProfile(profiles[0]);
+          await fetchLogs();
         }
-      });
-
-      const finalLogs = await Promise.all(logsWithSignedImages);
-      setLogs(finalLogs);
-
-    } catch (err) {
-      console.error('Error fetching travel logs:', err);
-    } finally {
-      setLoading(false);
+      } catch (err) {
+        console.error('Error checking profile or fetching logs:', err);
+      } finally {
+        setLoading(false); 
+      }
     }
-  }
+
+    async function fetchLogs() {
+      try {
+        const response = await client.graphql({
+          query: listTravelLogs
+        });
+        
+        let sortedLogs = response.data.listTravelLogs.items.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        const logsWithSignedImages = sortedLogs.map(async (log) => {
+          if (log.imageUrls && log.imageUrls.length > 0) {
+            const signedUrlsPromises = log.imageUrls.map(async (imageUrl) => {
+              const fileKey = imageUrl.split('.com/')[1];
+              const signedUrlResult = await getUrl({
+                key: fileKey,
+                options: {
+                  validateObjectExistence: true,
+                },
+              });
+              return signedUrlResult.url.href;
+            });
+            const signedUrls = await Promise.all(signedUrlsPromises);
+            return { ...log, signedImageUrls: signedUrls };
+          } else {
+            return log;
+          }
+        });
+
+        const finalLogs = await Promise.all(logsWithSignedImages);
+        setLogs(finalLogs);
+      } catch (err) {
+        console.error('Error fetching travel logs:', err);
+      }
+    }
+
+    if (user) {
+      checkProfileAndFetchData();
+    }
+  }, [user, router]); 
 
   async function handleDeleteLog(logId) {
     if (!window.confirm("Are you sure you want to delete this log forever?")) {
@@ -354,134 +383,146 @@ function Dashboard({ signOut, user }) {
     }
   }
 
-  const userEmail = user?.attributes?.email || user?.username || 'user@example.com';
-  const totalLogs = logs.length;
-
-  return (
-    <div style={styles.wrapper}>
-      {/* Sidebar */}
-      <div style={styles.sidebar}>
-        <h2 style={styles.sidebarTitle}>Traveler Portal</h2>
-        <Link href="/dashboard" style={{ ...styles.navItem, ...styles.navItemActive }}>
-          <span style={styles.navIcon}>📊</span>
-          <span>Dashboard</span>
-        </Link>
-        <Link href="/create-log" style={styles.navItem}>
-          <span style={styles.navIcon}>➕</span>
-          <span>Post New Log</span>
-        </Link>
-        <Link href="/dashboard" style={styles.navItem}>
-          <span style={styles.navIcon}>👤</span>
-          <span>Profile</span>
-        </Link>
-        <div style={styles.notificationIcon}>N</div>
+  if (loading) {
+    return (
+      <div style={styles.wrapper}>
+        <div style={styles.sidebar}>
+           <h2 style={styles.sidebarTitle}>Traveler Portal</h2>
+        </div>
+        <div style={{...styles.mainContent, ...styles.content, alignItems: 'center', paddingTop: '100px'}}>
+          <p>Loading your profile...</p>
+        </div>
       </div>
+    );
+  }
 
-      {/* Main Content */}
-      <div style={styles.mainContent}>
-        {/* Header */}
-        <div style={styles.header}>
-          <h1 style={styles.headerTitle}>Travel Portal</h1>
-          <div style={styles.headerRight}>
-            <span style={styles.userEmail}>{userEmail}</span>
-            <button onClick={signOut} style={styles.logoutButton}>
-              Logout
-            </button>
+  const totalLogs = logs.length;
+  
+  return (
+    profile && (
+      <div style={styles.wrapper}>
+        {/* Sidebar (unchanged) */}
+        <div style={styles.sidebar}>
+          <h2 style={styles.sidebarTitle}>Traveler Portal</h2>
+          <Link href="/dashboard" style={{ ...styles.navItem, ...styles.navItemActive }}>
+            <span style={styles.navIcon}>📊</span>
+            <span>Dashboard</span>
+          </Link>
+          <Link href="/create-log" style={styles.navItem}>
+            <span style={styles.navIcon}>➕</span>
+            <span>Post New Log</span>
+          </Link>
+          <Link href="/dashboard" style={styles.navItem}>
+            <span style={styles.navIcon}>👤</span>
+            <span>Profile</span>
+          </Link>
+          <div style={styles.notificationIcon}>N</div>
+        </div>
+
+        {/* Main Content */}
+        <div style={styles.mainContent}>
+          {/* Header */}
+          <div style={styles.header}>
+            <h1 style={styles.headerTitle}>Travel Portal</h1>
+            <div style={styles.headerRight}>
+              <span style={styles.userEmail}>
+                Welcome, {profile.username}!
+              </span>
+              <button onClick={signOut} style={styles.logoutButton}>
+                Logout
+              </button>
+            </div>
+          </div>
+
+          {/* Content (This JSX is unchanged) */}
+          <div style={styles.content}>
+            <h2 style={styles.dashboardTitle}>
+              Traveler Dashboard
+              <span style={{ fontSize: '18px', fontWeight: 'normal', color: '#666', marginLeft: '12px' }}>
+                ({totalLogs} {totalLogs === 1 ? 'log' : 'logs'})
+              </span>
+            </h2>
+
+            {!logs.length && (
+              <div style={{ ...styles.jobCard, marginTop: '40px' }}>
+                <p>You haven't created any logs yet. Time for an adventure?</p>
+                <Link href="/create-log" style={styles.viewDetailsButton}>
+                  Create Your First Log
+                </Link>
+              </div>
+            )}
+
+            {logs.length > 0 && (
+              <div style={{ marginTop: '40px' }}>
+                {logs.map((log) => (
+                  <div key={log.id} style={styles.jobCard}>
+                    <h3 style={styles.jobTitle}>{log.location || 'Untitled Location'}</h3>
+                    <div style={styles.jobLocation}>
+                      <span style={styles.locationIcon}>📍</span>
+                      <span>{log.location || 'Unknown Location'}</span>
+                    </div>
+                    <p style={styles.jobDescription}>
+                      {log.whatYouDidThere 
+                        ? (log.whatYouDidThere.length > 50 
+                            ? log.whatYouDidThere.substring(0, 50) + '...' 
+                            : log.whatYouDidThere)
+                        : 'No description available'}
+                    </p>
+                    
+                    {log.signedImageUrls && log.signedImageUrls.length > 0 && (
+                      <div style={styles.imageGallery}>
+                        {log.signedImageUrls.map((url, index) => (
+                          <div 
+                            key={index} 
+                            style={styles.imageItem}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.transform = 'scale(1.05)';
+                              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.transform = 'scale(1)';
+                              e.currentTarget.style.boxShadow = 'none';
+                            }}
+                          >
+                            <img 
+                              src={url} 
+                              alt={`${log.location} - Image ${index + 1}`}
+                              style={styles.image}
+                              loading="lazy"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    <div style={styles.buttonContainer}>
+                      <Link 
+                        href={`/edit-log/${log.id}`} 
+                        style={styles.editButton}
+                      >
+                        Edit Log
+                      </Link>
+                      <Link 
+                        href={`/edit-log/${log.id}`} 
+                        style={styles.viewButton}
+                      >
+                        View
+                      </Link>
+                      <button 
+                        onClick={() => handleDeleteLog(log.id)} 
+                        style={styles.deleteButton}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Content */}
-        <div style={styles.content}>
-          <h2 style={styles.dashboardTitle}>
-            Traveler Dashboard
-            <span style={{ fontSize: '18px', fontWeight: 'normal', color: '#666', marginLeft: '12px' }}>
-              ({totalLogs} {totalLogs === 1 ? 'log' : 'logs'})
-            </span>
-          </h2>
-
-          {/* Log Cards */}
-          {loading && <p style={{ marginTop: '40px' }}>Loading your adventures...</p>}
-          {!loading && logs.length === 0 && (
-            <div style={{ ...styles.jobCard, marginTop: '40px' }}>
-              <p>You haven't created any logs yet. Time for an adventure?</p>
-              <Link href="/create-log" style={styles.viewDetailsButton}>
-                Create Your First Log
-              </Link>
-            </div>
-          )}
-
-          {!loading && logs.length > 0 && (
-            <div style={{ marginTop: '40px' }}>
-              {logs.map((log) => (
-                <div key={log.id} style={styles.jobCard}>
-                  <h3 style={styles.jobTitle}>{log.location || 'Untitled Location'}</h3>
-                  <div style={styles.jobLocation}>
-                    <span style={styles.locationIcon}>📍</span>
-                    <span>{log.location || 'Unknown Location'}</span>
-                  </div>
-                  <p style={styles.jobDescription}>
-                    {log.whatYouDidThere 
-                      ? (log.whatYouDidThere.length > 50 
-                          ? log.whatYouDidThere.substring(0, 50) + '...' 
-                          : log.whatYouDidThere)
-                      : 'No description available'}
-                  </p>
-                  
-                  {/* Image Gallery */}
-                  {log.signedImageUrls && log.signedImageUrls.length > 0 && (
-                    <div style={styles.imageGallery}>
-                      {log.signedImageUrls.map((url, index) => (
-                        <div 
-                          key={index} 
-                          style={styles.imageItem}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'scale(1.05)';
-                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'scale(1)';
-                            e.currentTarget.style.boxShadow = 'none';
-                          }}
-                        >
-                          <img 
-                            src={url} 
-                            alt={`${log.location} - Image ${index + 1}`}
-                            style={styles.image}
-                            loading="lazy"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  
-                  <div style={styles.buttonContainer}>
-                    <Link 
-                      href={`/edit-log/${log.id}`} 
-                      style={styles.editButton}
-                    >
-                      Edit Log
-                    </Link>
-                    <Link 
-                      href={`/edit-log/${log.id}`} 
-                      style={styles.viewButton}
-                    >
-                      View
-                    </Link>
-                    <button 
-                      onClick={() => handleDeleteLog(log.id)} 
-                      style={styles.deleteButton}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-        </div>
       </div>
-    </div>
+    )
   );
 }
 
