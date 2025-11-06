@@ -57,7 +57,6 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
       });
 
       // --- BUGFIX: Fetch signed URLs for existing images ---
-      // This is what makes images show up on the "Edit" page.
       const fetchSignedUrls = async (permanentUrls) => {
         const signedImageObjects = await Promise.all(
           permanentUrls.map(async (permanentUrl) => {
@@ -125,7 +124,7 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
     );
   };
 
-  // --- Feature: Auto-Detect Location ---
+  // --- MODIFIED: Auto-Detect Location with High Accuracy ---
   const handleDetectLocation = async () => {
     setIsDetectingLocation(true);
     if (!navigator.geolocation) {
@@ -133,8 +132,11 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
       setIsDetectingLocation(false);
       return;
     }
+    
+    // This function now has THREE arguments
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+        // Success Callback
         const { latitude, longitude } = position.coords;
         try {
           const response = await fetch(
@@ -158,10 +160,18 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
         }
       },
       (err) => {
+        // Error Callback
         console.error("Geolocation failed:", err);
         alert("Unable to get your location. Please check browser permissions.");
         setIsDetectingLocation(false);
+      },
+      // --- THIS IS THE NEW PART ---
+      {
+        enableHighAccuracy: true, // Ask for GPS
+        timeout: 10000,           // Give it 10 seconds
+        maximumAge: 0             // Don't use an old, cached location
       }
+      // --- END OF NEW PART ---
     );
   };
 
@@ -259,10 +269,8 @@ export default function TravelLogForm({ initialData, handleSubmit, isSubmitting 
   };
 
   // --- Main Form Submit ---
-  // Gathers all data and passes it up to the parent page
   const onFormSubmit = (e) => {
     e.preventDefault();
-    // We only send the *permanent* URLs back, not the temporary signed ones
     const finalExistingUrls = existingImages.map(img => img.permanentUrl);
     handleSubmit(formData, newImageFiles, finalExistingUrls);
   };

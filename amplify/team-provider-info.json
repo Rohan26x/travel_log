@@ -33,7 +33,7 @@
         },
         "imageProxyFunction": {
           "deploymentBucketName": "amplify-travellog-dev-edba3-deployment",
-          "s3Key": "amplify-builds/imageProxyFunction-4a61432f354e69506c47-build.zip"
+          "s3Key": "amplify-builds/imageProxyFunction-42464c504e43764d6f54-build.zip"
         }
       }
     }
