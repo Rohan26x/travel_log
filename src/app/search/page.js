@@ -12,7 +12,7 @@ const client = generateClient();
 
 // --- We are copying the styles object from your dashboard ---
 const styles = {
-  // (All styles are unchanged)
+  // (Sidebar, Header, Content, etc. styles are all the same)
   wrapper: {
     display: 'flex',
     minHeight: '100vh',
@@ -170,12 +170,21 @@ const styles = {
   resultsContainer: {
     marginTop: '40px',
   },
+  // --- MODIFIED: Added flexbox ---
   resultCard: {
     backgroundColor: '#fff',
     borderRadius: '8px',
     padding: '20px',
     boxShadow: '0 2px 4px rgba(0,0,0,0.08)',
     marginBottom: '15px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  // --- NEW: For the text ---
+  resultText: {
+    flex: 1,
+    marginRight: '15px',
   },
   resultName: {
     fontSize: '18px',
@@ -187,7 +196,16 @@ const styles = {
     fontSize: '14px',
     color: '#666',
     marginTop: '5px',
-  }
+  },
+  // --- NEW: For the icon link ---
+  mapIconLink: {
+    fontSize: '28px',
+    color: '#f44336', // Red map pin color
+    textDecoration: 'none',
+    padding: '10px',
+    borderRadius: '50%',
+    transition: 'background-color 0.2s',
+  },
 };
 // --- END OF STYLES ---
 
@@ -226,7 +244,7 @@ function SearchPage({ signOut, user }) {
     fetchProfile();
   }, [user]);
   
-  // Text search handler (unchanged)
+  // Text search handler
   const handleSearch = async (e) => {
     e.preventDefault();
     if (searchTerm.trim() === '') return;
@@ -270,7 +288,6 @@ function SearchPage({ signOut, user }) {
         // On Success
         const { latitude, longitude } = position.coords;
         try {
-          // Call our API with the new lat/lon params
           const restOperation = get({
             apiName: 'locationSearchAPI',
             path: '/search',
@@ -298,7 +315,7 @@ function SearchPage({ signOut, user }) {
         setError("Unable to get your location. Please check browser permissions.");
         setIsFinding(false);
       },
-      { // Options
+      { 
         enableHighAccuracy: true,
         timeout: 10000,
         maximumAge: 0
@@ -401,16 +418,29 @@ function SearchPage({ signOut, user }) {
                 <p>No results. Try a new search.</p>
               )}
 
+              {/* --- MODIFIED: This is the new card layout --- */}
               {!isSearching && !isFinding && results.length > 0 && (
                 <div>
-                  {/* --- THIS IS THE FIX ---
-                    We now use both the placeId and index to create a 
-                    guaranteed unique key for React.
-                  --- END OF FIX --- */}
                   {results.map((place, index) => (
                     <div key={`${place.placeId}-${index}`} style={styles.resultCard}>
-                      <h3 style={styles.resultName}>{place.name}</h3>
-                      <p style={styles.resultAddress}>{place.address}</p>
+                      {/* Left side: Text content */}
+                      <div style={styles.resultText}>
+                        <h3 style={styles.resultName}>{place.name}</h3>
+                        <p style={styles.resultAddress}>{place.address}</p>
+                      </div>
+                      
+                      {/* Right side: Map Icon Link */}
+                      <a
+                        href={`https://www.google.com/maps?q=${place.coordinates[1]},${place.coordinates[0]}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Open in Google Maps"
+                        style={styles.mapIconLink}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                      >
+                        📍
+                      </a>
                     </div>
                   ))}
                 </div>
