@@ -1,25 +1,41 @@
-/* Reset default styles */
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+/* --- NEW: LIGHT-THEME STYLES FOR AUTHENTICATOR --- */
+
+/* This targets all the new form fields */
+[data-amplify-text-field],
+[data-amplify-select-field],
+[data-amplify-textarea-field] {
+  --amplify-colors-background-primary: #f9f9f9; /* Light field background */
+  --amplify-colors-font-primary: #333; /* Dark text */
+  --amplify-colors-border-primary: #ccc; /* Light border */
+  --amplify-colors-border-focus: #2196f3; /* Dashboard blue */
+  --amplify-shadows-focus: 0 0 0 3px rgba(33, 150, 243, 0.2);
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  background-color: #282c34; /* Dark background from your form */
-  color: #e0e0e0;           /* Light text from your form */
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+/* Style the labels for the new fields */
+[data-amplify-label] {
+  color: #444; /* Dark label */
 }
 
-a {
-  color: #61dafb; /* React/Amplify blue for links */
-  text-decoration: none;
+/* Style the "Sign In" / "Create Account" tabs */
+[data-amplify-tabs-item] {
+  color: #555; /* Dark-ish text */
+}
+[data-amplify-tabs-item][data-state="active"] {
+  color: #2196f3; /* Dashboard blue */
+  border-color: #2196f3;
 }
 
-a:hover {
-  text-decoration: underline;
+/* Style the main Sign In button to match dashboard */
+[data-amplify-button][data-variation="primary"] {
+  background-color: #2196f3;
+  color: #fff;
+  font-weight: bold;
+}
+[data-amplify-button][data-variation="primary"]:hover {
+  background-color: #1a78c2;
+}
+
+/* Style the "forgot password" link */
+[data-amplify-button][data-variation="link"] {
+  color: #2196f3;
 }

@@ -434,7 +434,7 @@ function Dashboard({ signOut, user }) {
                         Edit Log
                       </Link>
                       <Link 
-                        href={`/edit-log/${log.id}`} 
+                        href={`/view-log/${log.id}`} 
                         style={styles.viewButton}
                       >
                         View
