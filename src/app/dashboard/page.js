@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import Link from 'next/link';
 import { generateClient } from 'aws-amplify/api';
-
-// --- FIXED: Import 'getUrl' instead of 'get' ---
 import { getUrl } from 'aws-amplify/storage';
 
 import { listTravelLogs } from '@/graphql/queries';
@@ -13,100 +11,284 @@ import { deleteTravelLog } from '@/graphql/mutations';
 
 const client = generateClient();
 
-// (All the styles are the same, no changes here)
 const styles = {
-  container: { padding: '20px', maxWidth: '900px', margin: '0 auto' },
-  nav: {
+  wrapper: {
+    display: 'flex',
+    minHeight: '100vh',
+    backgroundColor: '#f5f5f5',
+  },
+  sidebar: {
+    width: '250px',
+    backgroundColor: '#f0f0f0',
+    padding: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'fixed',
+    height: '100vh',
+    left: 0,
+    top: 0,
+  },
+  sidebarTitle: {
+    fontSize: '18px',
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: '30px',
+    paddingBottom: '20px',
+    borderBottom: '1px solid #ddd',
+  },
+  navItem: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: '30px'
-  },
-  button: {
-    padding: '10px 15px',
-    backgroundColor: '#61dafb',
-    color: '#282c34',
-    border: 'none',
-    borderRadius: '4px',
+    gap: '12px',
+    padding: '12px 16px',
+    marginBottom: '8px',
+    borderRadius: '6px',
     cursor: 'pointer',
-    fontSize: '16px',
-    fontWeight: 'bold',
+    color: '#333',
     textDecoration: 'none',
-    display: 'inline-block',
+    fontSize: '14px',
+    transition: 'background-color 0.2s',
   },
-  signOutButton: {
-    padding: '10px 15px',
-    backgroundColor: '#555',
+  navItemActive: {
+    backgroundColor: '#e3f2fd',
+    borderLeft: '4px solid #2196f3',
+    fontWeight: '500',
+    color: '#2196f3',
+  },
+  navIcon: {
+    fontSize: '18px',
+    width: '20px',
+    textAlign: 'center',
+  },
+  mainContent: {
+    marginLeft: '250px',
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  header: {
+    backgroundColor: '#fff',
+    padding: '20px 40px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottom: '1px solid #e0e0e0',
+  },
+  headerTitle: {
+    fontSize: '24px',
+    fontWeight: 'bold',
+    color: '#333',
+    margin: 0,
+  },
+  headerRight: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '20px',
+  },
+  userEmail: {
+    fontSize: '14px',
+    color: '#666',
+  },
+  logoutButton: {
+    padding: '10px 20px',
+    backgroundColor: '#2196f3',
     color: 'white',
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
-    fontSize: '16px',
+    fontSize: '14px',
+    fontWeight: '500',
   },
-  logHistoryContainer: {
-    marginTop: '40px',
+  content: {
+    padding: '40px',
+    backgroundColor: '#fff',
+    minHeight: 'calc(100vh - 80px)',
   },
-  logBanner: {
-    backgroundColor: '#3a3f4b',
-    border: '1px solid #555',
-    borderRadius: '8px',
-    padding: '20px',
-    marginBottom: '20px',
-  },
-  logHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '15px',
-  },
-  logLocation: {
-    fontSize: '1.5rem',
+  dashboardTitle: {
+    fontSize: '28px',
     fontWeight: 'bold',
-    color: '#61dafb',
+    color: '#333',
+    marginBottom: '30px',
   },
-  logDescription: {
-    fontSize: '1.1rem',
-    color: '#e0e0e0',
+  metricsContainer: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '24px',
+    marginBottom: '40px',
   },
-  buttonContainer: {
+  metricCard: {
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    padding: '24px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.08)',
     display: 'flex',
     flexDirection: 'column',
-    gap: '10px',
-    minWidth: '50px',
+    gap: '12px',
   },
-  editButton: {
-    padding: '8px 12px',
-    backgroundColor: '#f39c12',
-    color: '#282c34',
+  metricIcon: {
+    fontSize: '32px',
+    marginBottom: '8px',
+  },
+  metricValue: {
+    fontSize: '36px',
+    fontWeight: 'bold',
+    color: '#2196f3',
+  },
+  metricValueGreen: {
+    fontSize: '36px',
+    fontWeight: 'bold',
+    color: '#4caf50',
+  },
+  metricLabel: {
+    fontSize: '14px',
+    color: '#666',
+  },
+  sectionTitle: {
+    fontSize: '20px',
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: '20px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  viewAllLink: {
+    fontSize: '14px',
+    color: '#2196f3',
+    textDecoration: 'none',
+    fontWeight: 'normal',
+  },
+  jobCard: {
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    padding: '24px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.08)',
+    marginBottom: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+  },
+  jobTitle: {
+    fontSize: '18px',
+    fontWeight: 'bold',
+    color: '#333',
+    margin: 0,
+  },
+  jobLocation: {
+    fontSize: '14px',
+    color: '#666',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+  },
+  locationIcon: {
+    color: '#f44336',
+    fontSize: '16px',
+  },
+  jobDescription: {
+    fontSize: '14px',
+    color: '#666',
+    marginTop: '8px',
+  },
+  viewDetailsButton: {
+    padding: '10px 20px',
+    backgroundColor: '#2196f3',
+    color: 'white',
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
-    fontWeight: 'bold',
+    fontSize: '14px',
+    fontWeight: '500',
+    marginTop: '12px',
+    alignSelf: 'center',
     textDecoration: 'none',
+    display: 'inline-block',
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    display: 'flex',
+    gap: '10px',
+    marginTop: '12px',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  },
+  editButton: {
+    padding: '10px 20px',
+    backgroundColor: '#f39c12',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '500',
+    textDecoration: 'none',
+    display: 'inline-block',
     textAlign: 'center',
   },
   deleteButton: {
-    padding: '8px 12px',
+    padding: '10px 20px',
     backgroundColor: '#e74c3c',
     color: 'white',
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '500',
+  },
+  viewButton: {
+    padding: '10px 20px',
+    backgroundColor: '#2196f3',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '500',
+    textDecoration: 'none',
+    display: 'inline-block',
+    textAlign: 'center',
+  },
+  notificationIcon: {
+    position: 'absolute',
+    bottom: '20px',
+    left: '20px',
+    width: '32px',
+    height: '32px',
+    backgroundColor: '#f44336',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white',
+    fontSize: '16px',
     fontWeight: 'bold',
   },
   imageGallery: {
-    display: 'flex',
-    gap: '10px',
-    marginTop: '15px',
-    overflowX: 'auto',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+    gap: '12px',
+    marginTop: '16px',
+    marginBottom: '8px',
   },
-  logImage: {
-    width: '150px',
-    height: '100px',
+  imageItem: {
+    position: 'relative',
+    width: '100%',
+    paddingTop: '75%', // 4:3 aspect ratio
+    borderRadius: '8px',
+    overflow: 'hidden',
+    backgroundColor: '#f5f5f5',
+    cursor: 'pointer',
+    transition: 'transform 0.2s, box-shadow 0.2s',
+  },
+  image: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
     objectFit: 'cover',
-    borderRadius: '4px',
-    border: '1px solid #555',
-  }
+    borderRadius: '8px',
+  },
 };
 
 function Dashboard({ signOut, user }) {
@@ -119,7 +301,6 @@ function Dashboard({ signOut, user }) {
 
   async function fetchLogs() {
     try {
-      // 1. Fetch the log data
       const response = await client.graphql({
         query: listTravelLogs
       });
@@ -128,24 +309,18 @@ function Dashboard({ signOut, user }) {
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
 
-      // 2. Get signed URLs for the images
       const logsWithSignedImages = sortedLogs.map(async (log) => {
         if (log.imageUrls && log.imageUrls.length > 0) {
-          
           const signedUrlsPromises = log.imageUrls.map(async (imageUrl) => {
             const fileKey = imageUrl.split('.com/')[1];
-            
-            // --- FIXED: Call 'getUrl' instead of 'get' ---
             const signedUrlResult = await getUrl({
               key: fileKey,
               options: {
                 validateObjectExistence: true,
               },
             });
-            
-            return signedUrlResult.url.href; // Get the URL string
+            return signedUrlResult.url.href;
           });
-          
           const signedUrls = await Promise.all(signedUrlsPromises);
           return { ...log, signedImageUrls: signedUrls };
         } else {
@@ -153,9 +328,7 @@ function Dashboard({ signOut, user }) {
         }
       });
 
-      // 3. Wait for all logs and all their images to be processed
       const finalLogs = await Promise.all(logsWithSignedImages);
-
       setLogs(finalLogs);
 
     } catch (err) {
@@ -181,76 +354,134 @@ function Dashboard({ signOut, user }) {
     }
   }
 
+  const userEmail = user?.attributes?.email || user?.username || 'user@example.com';
+  const totalLogs = logs.length;
+
   return (
-    <main style={styles.container}>
-      <nav style={styles.nav}>
-        <h1>Hello, {user.username}</h1>
-        <button onClick={signOut} style={styles.signOutButton}>
-          Sign Out
-        </button>
-      </nav>
+    <div style={styles.wrapper}>
+      {/* Sidebar */}
+      <div style={styles.sidebar}>
+        <h2 style={styles.sidebarTitle}>Traveler Portal</h2>
+        <Link href="/dashboard" style={{ ...styles.navItem, ...styles.navItemActive }}>
+          <span style={styles.navIcon}>📊</span>
+          <span>Dashboard</span>
+        </Link>
+        <Link href="/create-log" style={styles.navItem}>
+          <span style={styles.navIcon}>➕</span>
+          <span>Post New Log</span>
+        </Link>
+        <Link href="/dashboard" style={styles.navItem}>
+          <span style={styles.navIcon}>👤</span>
+          <span>Profile</span>
+        </Link>
+        <div style={styles.notificationIcon}>N</div>
+      </div>
 
-      <Link href="/create-log" style={styles.button}>
-        + Create New Log
-      </Link>
+      {/* Main Content */}
+      <div style={styles.mainContent}>
+        {/* Header */}
+        <div style={styles.header}>
+          <h1 style={styles.headerTitle}>Travel Portal</h1>
+          <div style={styles.headerRight}>
+            <span style={styles.userEmail}>{userEmail}</span>
+            <button onClick={signOut} style={styles.logoutButton}>
+              Logout
+            </button>
+          </div>
+        </div>
 
-      <section style={styles.logHistoryContainer}>
-        <h2>Log History</h2>
+        {/* Content */}
+        <div style={styles.content}>
+          <h2 style={styles.dashboardTitle}>
+            Traveler Dashboard
+            <span style={{ fontSize: '18px', fontWeight: 'normal', color: '#666', marginLeft: '12px' }}>
+              ({totalLogs} {totalLogs === 1 ? 'log' : 'logs'})
+            </span>
+          </h2>
 
-        {loading && <p>Loading your adventures...</p>}
-        {!loading && logs.length === 0 && (
-          <p>You haven't created any logs yet. Time for an adventure?</p>
-        )}
+          {/* Log Cards */}
+          {loading && <p style={{ marginTop: '40px' }}>Loading your adventures...</p>}
+          {!loading && logs.length === 0 && (
+            <div style={{ ...styles.jobCard, marginTop: '40px' }}>
+              <p>You haven't created any logs yet. Time for an adventure?</p>
+              <Link href="/create-log" style={styles.viewDetailsButton}>
+                Create Your First Log
+              </Link>
+            </div>
+          )}
 
-        {!loading && logs.length > 0 && (
-          <div>
-            {logs.map((log) => (
-              <div key={log.id} style={styles.logBanner}>
-                
-                {/* 1. Content (Log info + images) */}
-                <div style={{ flexGrow: 1 }}>
-                  <div style={styles.logHeader}>
-                    <h3 style={styles.logLocation}>{log.location}</h3>
+          {!loading && logs.length > 0 && (
+            <div style={{ marginTop: '40px' }}>
+              {logs.map((log) => (
+                <div key={log.id} style={styles.jobCard}>
+                  <h3 style={styles.jobTitle}>{log.location || 'Untitled Location'}</h3>
+                  <div style={styles.jobLocation}>
+                    <span style={styles.locationIcon}>📍</span>
+                    <span>{log.location || 'Unknown Location'}</span>
                   </div>
-
-                  <p style={styles.logDescription}>{log.whatYouDidThere}</p>
-
+                  <p style={styles.jobDescription}>
+                    {log.whatYouDidThere 
+                      ? (log.whatYouDidThere.length > 50 
+                          ? log.whatYouDidThere.substring(0, 50) + '...' 
+                          : log.whatYouDidThere)
+                      : 'No description available'}
+                  </p>
+                  
                   {/* Image Gallery */}
                   {log.signedImageUrls && log.signedImageUrls.length > 0 && (
                     <div style={styles.imageGallery}>
                       {log.signedImageUrls.map((url, index) => (
-                        <img 
+                        <div 
                           key={index} 
-                          src={url} 
-                          alt={`Log photo ${index + 1}`} 
-                          style={styles.logImage} 
-                        />
+                          style={styles.imageItem}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.05)';
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        >
+                          <img 
+                            src={url} 
+                            alt={`${log.location} - Image ${index + 1}`}
+                            style={styles.image}
+                            loading="lazy"
+                          />
+                        </div>
                       ))}
                     </div>
                   )}
+                  
+                  <div style={styles.buttonContainer}>
+                    <Link 
+                      href={`/edit-log/${log.id}`} 
+                      style={styles.editButton}
+                    >
+                      Edit Log
+                    </Link>
+                    <Link 
+                      href={`/edit-log/${log.id}`} 
+                      style={styles.viewButton}
+                    >
+                      View
+                    </Link>
+                    <button 
+                      onClick={() => handleDeleteLog(log.id)} 
+                      style={styles.deleteButton}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
+              ))}
+            </div>
+          )}
 
-                {/* 2. Buttons (Edit/Delete) */}
-                <div style={styles.buttonContainer}>
-                  <Link 
-                    href={`/edit-log/${log.id}`} 
-                    style={styles.editButton}
-                  >
-                    Edit
-                  </Link>
-                  <button 
-                    onClick={() => handleDeleteLog(log.id)} 
-                    style={styles.deleteButton}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-    </main>
+        </div>
+      </div>
+    </div>
   );
 }
 
