@@ -8,16 +8,9 @@ import { Amplify } from 'aws-amplify';
 import { uploadData } from 'aws-amplify/storage';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import Link from 'next/link';
-
-// --- THIS IS THE FIX ---
-// createTravelLog comes from mutations
 import { createTravelLog } from '@/graphql/mutations'; 
-// listProfiles comes from queries
 import { listProfiles } from '@/graphql/queries'; 
-// --- END OF FIX ---
-
 import TravelLogForm from '../components/TravelLogForm';
-// Import the light-theme CSS from the profile page
 import '../create-profile/ProfileForm.css'; 
 
 const client = generateClient();
@@ -221,6 +214,11 @@ function CreateLogPage({ signOut, user }) {
         <Link href="/profile" style={styles.navItem}>
           <span style={styles.navIcon}>👤</span>
           <span>Profile</span>
+        </Link>
+        {/* --- NEW LINK ADDED --- */}
+        <Link href="/search" style={styles.navItem}>
+          <span style={styles.navIcon}>🔍</span>
+          <span>Search Places</span>
         </Link>
         <div style={styles.notificationIcon}>N</div>
       </div>

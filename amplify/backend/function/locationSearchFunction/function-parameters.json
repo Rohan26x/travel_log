@@ -1,0 +1,10 @@
+{
+  "lambdaLayers": [],
+  "permissions": {
+    "geo": {
+      "travelLogPlaceIndex": [
+        "read"
+      ]
+    }
+  }
+}

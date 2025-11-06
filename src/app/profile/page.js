@@ -1,19 +1,15 @@
 'use client';
 
-// This file is 90% a copy of your dashboard/page.js
 import { useState, useEffect } from 'react';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { generateClient } from 'aws-amplify/api';
-// We only need listProfiles for this page
 import { listProfiles } from '@/graphql/queries'; 
 
 const client = generateClient();
 
-// I've copied your styles and added new ones for the profile card
 const styles = {
-  // --- (All your existing styles from dashboard) ---
   wrapper: {
     display: 'flex',
     minHeight: '100vh',
@@ -51,7 +47,7 @@ const styles = {
     fontSize: '14px',
     transition: 'background-color 0.2s',
   },
-  navItemActive: { // This is the 'active' style
+  navItemActive: { 
     backgroundColor: '#e3f2fd',
     borderLeft: '4px solid #2196f3',
     fontWeight: '500',
@@ -121,8 +117,6 @@ const styles = {
     fontSize: '16px',
     fontWeight: 'bold',
   },
-  
-  // --- NEW STYLES FOR THIS PAGE ---
   profileCard: {
     backgroundColor: '#fff',
     borderRadius: '8px',
@@ -169,7 +163,7 @@ const styles = {
   detailValue: {
     fontSize: '16px',
     color: '#333',
-    whiteSpace: 'pre-wrap', // This makes the 'bio' text wrap properly
+    whiteSpace: 'pre-wrap', 
   }
 };
 
@@ -179,7 +173,6 @@ function ProfilePage({ signOut, user }) {
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    // This is the same "gatekeeper" logic from your dashboard
     async function checkProfile() {
       try {
         const profileData = await client.graphql({
@@ -193,10 +186,8 @@ function ProfilePage({ signOut, user }) {
         const profiles = profileData.data.listProfiles.items;
 
         if (profiles.length === 0) {
-          // If they somehow land here without a profile, send them to create it
           router.push('/create-profile');
         } else {
-          // Profile exists, so store it
           setProfile(profiles[0]);
         }
       } catch (err) {
@@ -211,7 +202,6 @@ function ProfilePage({ signOut, user }) {
     }
   }, [user, router]);
 
-  // Show a loading screen while we check/fetch the profile
   if (loading) {
     return (
       <div style={styles.wrapper}>
@@ -225,8 +215,6 @@ function ProfilePage({ signOut, user }) {
     );
   }
 
-  // If we're done loading and still have no profile, something is wrong
-  // (though the gatekeeper should have redirected)
   if (!profile) {
     return (
        <div style={styles.wrapper}>
@@ -243,7 +231,7 @@ function ProfilePage({ signOut, user }) {
   // --- Main Page Render ---
   return (
     <div style={styles.wrapper}>
-      {/* Sidebar - MODIFIED to show 'Profile' as active */}
+      {/* Sidebar - 'Profile' is active */}
       <div style={styles.sidebar}>
         <h2 style={styles.sidebarTitle}>Traveler Portal</h2>
         <Link href="/dashboard" style={styles.navItem}>
@@ -254,10 +242,14 @@ function ProfilePage({ signOut, user }) {
           <span style={styles.navIcon}>➕</span>
           <span>Post New Log</span>
         </Link>
-        {/* This is now the active link */}
         <Link href="/profile" style={{ ...styles.navItem, ...styles.navItemActive }}>
           <span style={styles.navIcon}>👤</span>
           <span>Profile</span>
+        </Link>
+        {/* --- NEW LINK ADDED --- */}
+        <Link href="/search" style={styles.navItem}>
+          <span style={styles.navIcon}>🔍</span>
+          <span>Search Places</span>
         </Link>
         <div style={styles.notificationIcon}>N</div>
       </div>
@@ -277,13 +269,12 @@ function ProfilePage({ signOut, user }) {
           </div>
         </div>
 
-        {/* --- NEW: Profile Content Area --- */}
+        {/* Profile Content Area */}
         <div style={styles.content}>
           <div style={styles.profileCard}>
             
             <div style={styles.profileHeader}>
               <h2 style={styles.profileTitle}>My Profile</h2>
-              {/* This button is ready for our next step */}
               <Link href="/edit-profile" style={styles.editProfileButton}>
                 Edit Profile
               </Link>
@@ -293,7 +284,6 @@ function ProfilePage({ signOut, user }) {
               <span style={styles.detailLabel}>Username</span>
               <span style={styles.detailValue}>{profile.username}</span>
 
-              {/* --- THIS IS THE FIX --- */}
               <span style={styles.detailLabel}>Email</span>
               <span style={styles.detailValue}>{user.username}</span>
 

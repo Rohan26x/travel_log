@@ -10,10 +10,9 @@ import { getTravelLog, listProfiles } from '@/graphql/queries';
 
 const client = generateClient();
 
-// --- STYLES OBJECT (with modifications) ---
 const styles = {
   wrapper: {
-     display: 'flex',
+    display: 'flex',
     minHeight: '100vh',
     backgroundColor: '#f5f5f5',
   },
@@ -119,7 +118,6 @@ const styles = {
     fontSize: '16px',
     fontWeight: 'bold',
   },
-  // Styles for the log content
   profileCard: {
     backgroundColor: '#fff',
     borderRadius: '8px',
@@ -155,7 +153,7 @@ const styles = {
   },
   profileDetails: {
     display: 'grid',
-    gridTemplateColumns: '200px 1fr', // Label column and Value column
+    gridTemplateColumns: '200px 1fr', 
     gap: '20px',
   },
   detailLabel: {
@@ -168,14 +166,13 @@ const styles = {
     color: '#333',
     whiteSpace: 'pre-wrap', 
   },
-  // --- MODIFIED: Images are larger ---
   imageGallery: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
     gap: '15px',
-    marginTop: '30px', // Added top margin
-    borderTop: '1px solid #e0e0e0', // Separator line
-    paddingTop: '30px', // Space above images
+    marginTop: '30px', 
+    borderTop: '1px solid #e0e0e0', 
+    paddingTop: '30px', 
   },
   imageItem: {
     position: 'relative',
@@ -266,7 +263,6 @@ function ViewLogPage({ signOut, user }) {
   }, [params, user, router]);
 
   // --- Render logic ---
-
   if (loading) {
     return (
       <div style={styles.wrapper}>
@@ -280,7 +276,6 @@ function ViewLogPage({ signOut, user }) {
     );
   }
 
-  // Use the same sidebar/header as the dashboard
   return (
     <div style={styles.wrapper}>
       {/* Sidebar - Mark "Dashboard" as active */}
@@ -297,6 +292,11 @@ function ViewLogPage({ signOut, user }) {
         <Link href="/profile" style={styles.navItem}>
           <span style={styles.navIcon}>👤</span>
           <span>Profile</span>
+        </Link>
+        {/* --- NEW LINK ADDED --- */}
+        <Link href="/search" style={styles.navItem}>
+          <span style={styles.navIcon}>🔍</span>
+          <span>Search Places</span>
         </Link>
         <div style={styles.notificationIcon}>N</div>
       </div>
@@ -316,7 +316,7 @@ function ViewLogPage({ signOut, user }) {
           </div>
         </div>
 
-        {/* --- MODIFIED: Log View Content Area --- */}
+        {/* Log View Content Area */}
         <div style={styles.content}>
           <div style={styles.profileCard}>
             
@@ -331,8 +331,7 @@ function ViewLogPage({ signOut, user }) {
                   </Link>
                 </div>
                 
-                {/* --- MODIFIED: Details are now first --- */}
-                <div style={styles.profileDetails}>
+                <div style={{...styles.profileDetails, marginTop: '30px'}}>
                   <span style={styles.detailLabel}>What You Did</span>
                   <span style={styles.detailValue}>{log.whatYouDidThere || 'N/A'}</span>
 
@@ -352,7 +351,6 @@ function ViewLogPage({ signOut, user }) {
                   <span style={styles.detailValue}>{log.weather || 'N/A'}</span>
                 </div>
 
-                {/* --- MODIFIED: Gallery is now second --- */}
                 {signedImageUrls.length > 0 && (
                   <div style={styles.imageGallery}>
                     {signedImageUrls.map((url, index) => (

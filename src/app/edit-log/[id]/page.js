@@ -5,15 +5,13 @@ import { withAuthenticator } from '@aws-amplify/ui-react';
 import { useRouter, useParams } from 'next/navigation';
 import { generateClient } from 'aws-amplify/api';
 import { Amplify } from 'aws-amplify';
-import { uploadData, remove } from 'aws-amplify/storage';
+import { uploadData, remove } from 'aws-amplify/storage'; 
 import { fetchAuthSession } from 'aws-amplify/auth';
 import Link from 'next/link';
-
-import { getTravelLog, listProfiles } from '@/graphql/queries';
+import { getTravelLog, listProfiles } from '@/graphql/queries'; 
 import { updateTravelLog } from '@/graphql/mutations'; 
 import TravelLogForm from '../../components/TravelLogForm';
-
-// --- REMOVED THE CSS IMPORT FROM HERE ---
+import '../../create-profile/ProfileForm.css'; 
 
 const client = generateClient();
 
@@ -252,6 +250,11 @@ function EditLogPage({ signOut, user }) {
           <span style={styles.navIcon}>👤</span>
           <span>Profile</span>
         </Link>
+        {/* --- NEW LINK ADDED --- */}
+        <Link href="/search" style={styles.navItem}>
+          <span style={styles.navIcon}>🔍</span>
+          <span>Search Places</span>
+        </Link>
         <div style={styles.notificationIcon}>N</div>
       </div>
 
@@ -271,7 +274,6 @@ function EditLogPage({ signOut, user }) {
         {/* Content Area - This holds the form */}
         <div style={styles.content}>
           
-          {/* We render the form in a wrapper to center it */}
           <div className="log-form-container" style={{maxWidth: '1000px', margin: '0 auto', padding: '10px'}}>
              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', borderBottom: '1px solid #eee', paddingBottom: '20px' }}>
               <h1 style={{color: '#333', margin: 0}}>
@@ -290,12 +292,11 @@ function EditLogPage({ signOut, user }) {
               <p className="status-message error">{error}</p>
             )}
 
-            {/* Show the form ONLY if we have the log data */}
             {!loading && log && (
               <TravelLogForm
                 handleSubmit={handleUpdateLog}
                 isSubmitting={isSubmitting}
-                initialData={log} // <-- This pre-fills the form
+                initialData={log} 
               />
             )}
           </div>

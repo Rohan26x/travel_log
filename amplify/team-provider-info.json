@@ -19,7 +19,8 @@
       "api": {
         "travellog": {},
         "googleImageSearch": {},
-        "imageProxy": {}
+        "imageProxy": {},
+        "locationSearchAPI": {}
       },
       "storage": {
         "travellogdb": {}
@@ -34,7 +35,14 @@
         "imageProxyFunction": {
           "deploymentBucketName": "amplify-travellog-dev-edba3-deployment",
           "s3Key": "amplify-builds/imageProxyFunction-42464c504e43764d6f54-build.zip"
+        },
+        "locationSearchFunction": {
+          "deploymentBucketName": "amplify-travellog-dev-edba3-deployment",
+          "s3Key": "amplify-builds/locationSearchFunction-473956354264692f6c6e-build.zip"
         }
+      },
+      "geo": {
+        "travelLogPlaceIndex": {}
       }
     }
   }

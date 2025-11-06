@@ -28,6 +28,20 @@
       "providerPlugin": "awscloudformation",
       "service": "API Gateway"
     },
+    "locationSearchAPI": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "locationSearchFunction"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    },
     "travellog": {
       "dependsOn": [
         {
@@ -100,6 +114,39 @@
       ],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "locationSearchFunction": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name"
+          ],
+          "category": "geo",
+          "resourceName": "travelLogPlaceIndex"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "geo": {
+    "travelLogPlaceIndex": {
+      "accessType": "AuthorizedUsers",
+      "dataProvider": "HERE",
+      "dataSourceIntendedUse": "SingleUse",
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "travellog44cb0c14"
+        }
+      ],
+      "isDefault": true,
+      "providerPlugin": "awscloudformation",
+      "service": "PlaceIndex"
     }
   },
   "parameters": {
@@ -148,6 +195,22 @@
         {
           "category": "function",
           "resourceName": "imageProxyFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_locationSearchFunction_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "locationSearchFunction"
+        }
+      ]
+    },
+    "AMPLIFY_function_locationSearchFunction_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "locationSearchFunction"
         }
       ]
     }

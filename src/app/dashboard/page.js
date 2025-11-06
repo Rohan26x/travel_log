@@ -243,8 +243,6 @@ const styles = {
     objectFit: 'cover',
     borderRadius: '8px',
   },
-  
-  // --- THIS IS THE NEW STYLE FOR THE FLOATING BUTTON ---
   floatingActionButton: {
     position: 'fixed',
     width: '60px',
@@ -261,10 +259,10 @@ const styles = {
     fontWeight: 'bold',
     textDecoration: 'none',
     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-    zIndex: 1001, // Higher than the sidebar
+    zIndex: 1001, 
     transition: 'transform 0.2s ease-in-out, background-color 0.2s',
   },
-  floatingActionButtonHover: { // We'll add this with JS, but define it here
+  floatingActionButtonHover: {
      transform: 'scale(1.1)',
      backgroundColor: '#1a78c2',
   }
@@ -276,7 +274,7 @@ function Dashboard({ signOut, user }) {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null); 
-  const [isFabHovered, setIsFabHovered] = useState(false); // For hover effect
+  const [isFabHovered, setIsFabHovered] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -382,6 +380,11 @@ function Dashboard({ signOut, user }) {
             <span style={styles.navIcon}>👤</span>
             <span>Profile</span>
           </Link>
+          {/* --- NEW LINK ADDED --- */}
+          <Link href="/search" style={styles.navItem}>
+            <span style={styles.navIcon}>🔍</span>
+            <span>Search Places</span>
+          </Link>
           <div style={styles.notificationIcon}>N</div>
         </div>
 
@@ -408,8 +411,6 @@ function Dashboard({ signOut, user }) {
                 ({totalLogs} {totalLogs === 1 ? 'log' : 'logs'})
               </span>
             </h2>
-
-            {/* --- OLD BUTTON IS REMOVED FROM HERE --- */}
 
             {/* Log Cards */}
             {!logs.length && (
@@ -491,7 +492,7 @@ function Dashboard({ signOut, user }) {
           </div>
         </div>
 
-        {/* --- THIS IS THE NEW FLOATING BUTTON --- */}
+        {/* Floating Action Button */}
         <Link 
           href="/create-log"
           style={{
