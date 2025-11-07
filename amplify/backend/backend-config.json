@@ -149,70 +149,11 @@
       "service": "PlaceIndex"
     }
   },
-  "parameters": {
-    "AMPLIFY_function_googleImageSearch_deploymentBucketName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "googleImageSearch"
-        }
-      ]
-    },
-    "AMPLIFY_function_googleImageSearch_googleApiKey": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "googleImageSearch"
-        }
-      ]
-    },
-    "AMPLIFY_function_googleImageSearch_googleSearchEngineId": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "googleImageSearch"
-        }
-      ]
-    },
-    "AMPLIFY_function_googleImageSearch_s3Key": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "googleImageSearch"
-        }
-      ]
-    },
-    "AMPLIFY_function_imageProxyFunction_deploymentBucketName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "imageProxyFunction"
-        }
-      ]
-    },
-    "AMPLIFY_function_imageProxyFunction_s3Key": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "imageProxyFunction"
-        }
-      ]
-    },
-    "AMPLIFY_function_locationSearchFunction_deploymentBucketName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "locationSearchFunction"
-        }
-      ]
-    },
-    "AMPLIFY_function_locationSearchFunction_s3Key": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "locationSearchFunction"
-        }
-      ]
+  "hosting": {
+    "amplifyhosting": {
+      "lastPushTimeStamp": "2025-11-06T10:38:35.510Z",
+      "service": "amplifyhosting",
+      "type": "cicd"
     }
   },
   "storage": {
